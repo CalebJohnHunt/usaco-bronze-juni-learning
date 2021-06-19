@@ -2,7 +2,7 @@
 
 ## What ##
 
-C++ and Python solutions to USACO challenges found in [Juni Learning](https://junilearning.com/)'s USACO Bronze course.  
+C++ and Python solutions to [USACO challenges](https://train.usaco.org/) found in [Juni Learning](https://junilearning.com/)'s USACO Bronze course.  
 Numbering is according to Juni's order, but naming is USACO-based.
 
 ## Why ##
