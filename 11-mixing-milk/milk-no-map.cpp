@@ -26,12 +26,10 @@ int main() {
 
     infile.close();
 
-    price = 0;
-    while (milkToBuy > 0) {
+    for (price = 0; milkToBuy; ++price) {
         quantity = MIN(milkToBuy, quantityAtPrice[price]);
         milkToBuy -= quantity;
         moneySpent += quantity * price;
-        ++price;
     }
 
     std::ofstream outfile("milk.out");
