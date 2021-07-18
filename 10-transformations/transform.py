@@ -5,16 +5,6 @@ PROG: transform
 """
 
 from copy import deepcopy
-from types import new_class
-
-def isSame(first, second) -> bool:
-    for i in range(len(first)):
-        for j in range(len(first)):
-            if first[i][j] != second[i][j]:
-                return False
-
-    return True
-
 
 def print2dArray(array):
     for row in array:
@@ -41,7 +31,7 @@ def findPattern(startSquare, endSquare):
     # 1, 2, 3: N 90 degrees rotations
     for i in range(1, 4):
         rotate2dArray(startSquare)
-        if (isSame(startSquare, endSquare)):
+        if startSquare == endSquare:
             return i
     
 
@@ -50,18 +40,18 @@ def findPattern(startSquare, endSquare):
 
     # 4: Flipped
     flip2dArray(startSquare)
-    if (isSame(startSquare, endSquare)):
+    if startSquare == endSquare:
         return 4
 
     # 5: Combination (Flip + any rotate)
     for i in range(4):
         rotate2dArray(startSquare)
-        if (isSame(startSquare, endSquare)):
+        if startSquare == endSquare:
             return 5
     
     
     # 6: No change
-    if (isSame(startSquare, endSquare)):
+    if startSquare == endSquare:
         return 6
 
     # 7: Invalid
