@@ -27,6 +27,9 @@ struct allScenarios {
     int size;
 };
 
+void pW(wormhole w[], int N);
+void pS(scenario* s);
+
 allScenarios calc(scenario s) {
     // Base case:
     // Only have 2 wormholes to connect
@@ -34,7 +37,7 @@ allScenarios calc(scenario s) {
     if (s.size == 2) {
         s.wormholes[0].pair = &s.wormholes[1];
         s.wormholes[1].pair = &s.wormholes[0];
-        a.scenarios = &s;
+        a.scenarios = &s; // Copy of s?
         a.size = 1;
         return a;
     }
@@ -60,9 +63,9 @@ allScenarios calc(scenario s) {
             a.scenarios = new scenario[1*3*5*7*9*11];
             a.size = 1*3*5*7*9*11;
             break;
+        default:
+            DEBUG("Wrong size?? " << s.size)
     }
-
-    DEBUG(1)
 
     // Recursive case:
     int counter = 0;
@@ -70,10 +73,6 @@ allScenarios calc(scenario s) {
         // pair w[0] and w[i]
         s.wormholes[0].pair = &s.wormholes[i];
         s.wormholes[i].pair = &s.wormholes[0];
-
-        DEBUG(2)
-
-
 
         // Make new sub-scenario (without w[0] and w[i])
         scenario newS;
@@ -85,32 +84,34 @@ allScenarios calc(scenario s) {
             }
         }
 
-        DEBUG(3)
-
+        DEBUG("newS:")
+        pS(&newS);
 
         // Find all the scenarios possible with sub-scenario
         allScenarios b = calc(newS);
 
-        DEBUG(3.1)
+        DEBUG("b.size: " << b.size)
+
+        for (int i = 0; i < b.size; ++i) {
+            std::cout << "b.sce[" << i << "].size: " << b.scenarios[i].size;
+        }
 
         // Attach w[0] and w[i] with each scenario
         // Add the resulting scenario to returning allScenario
         for (int k = 0; k < b.size; ++k) {
+            DEBUG("b.scenarios[" << k << "].size: " << b.scenarios[k].size << ':')
+            pS(&(b.scenarios[k]));
             scenario foo;
-            DEBUG(3.2 << " k: " << k)
             foo.size = s.size;
             foo.wormholes = new wormhole[foo.size];
             foo.wormholes[0] = s.wormholes[0];
             foo.wormholes[1] = s.wormholes[i];
-            DEBUG(3.3)
             for (int j = 0; j < b.scenarios[k].size; ++j) {
+                DEBUG("j " << j << " k " << k)
                 foo.wormholes[j+2] = b.scenarios[k].wormholes[j];
             }
             a.scenarios[counter++] = foo;
         }
-        DEBUG(4)
-
-
     }
     return a;
 }
@@ -130,10 +131,17 @@ void pW(wormhole w[], int N) {
     }
 }
 
+void pS(scenario* s) {
+    for (int i = 0; i < s->size; ++i) {
+        pW(s->wormholes, s->size);
+    }
+}
+
 int main() {
     std::ifstream fin("wormhole.in");
     int N, i, j;
     fin >> N;
+    N = 4;
     wormhole wormholes[N];
 
     for (i = 0; i < N; ++i) {
@@ -174,7 +182,7 @@ int main() {
     pW(wormholes, N);
 
     scenario s;
-    s.size = 4;
+    s.size = N;
     s.wormholes = wormholes;
 
     allScenarios a = calc(s);
