@@ -12,9 +12,7 @@ PROG: skidesign
  * We repeat until the difference from tallest and shortest hills <= 17
  * 
  * Complexity:
- * We use qsort, which I think is nlogn. Then with "repeat until <=17",
- * I'm really not sure what complexity that adds. Regardless, because I
- * only use qsort at the start 
+ * I don't even know. I think sorting the data while taking it in is n^2?
 */
 
 #include <iostream>
