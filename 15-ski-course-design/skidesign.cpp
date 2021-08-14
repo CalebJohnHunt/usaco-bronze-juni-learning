@@ -53,13 +53,11 @@ int inline findNumOfEquallyTallHills(const Hill* hills, const int& size) {
     return count;
 }
 
-int addToHills(Hill* hills, const int& size) {
+int addToHills(Hill* hills, const int& size, int& equallyShortHills, int& equallyTallHills) {
     // Calculate the price to raise all the shortest hills
-    const int equallyShortHills = findNumOfEquallyShortHills(hills, size);
     const int priceForShortHills = findPriceToChangeNHills(hills, equallyShortHills);
 
     // Calculate the price for tallest hills
-    const int equallyTallHills  = findNumOfEquallyTallHills(hills, size);
     const int priceForTallHills  = findPriceToChangeNHills(hills + size - equallyTallHills, equallyTallHills);
 
     // If it's cheaper to raise the short hills, raise them
@@ -69,6 +67,10 @@ int addToHills(Hill* hills, const int& size) {
             hills[i].height++;
             hills[i].change++;
         }
+        // Update number of short hills
+        while (hills[equallyShortHills-1].height == hills[equallyShortHills].height
+            && equallyShortHills < size)
+            ++equallyShortHills;
         return priceForShortHills;
     }
 
@@ -76,6 +78,10 @@ int addToHills(Hill* hills, const int& size) {
         hills[i].height--;
         hills[i].change++;
     }
+    // Update number of tall hills
+    while (hills[size-equallyTallHills].height == hills[size-equallyTallHills-1].height
+        && equallyTallHills < size)
+        ++equallyTallHills;
     return priceForTallHills;
 }
 
@@ -112,9 +118,14 @@ int main() {
     // readHills updates N and sorts the hills as they come in
     Hill* hills = readHills(N);
 
+    // We're going to raise up all the shortest or lower all the tallest hills
+    // at the same time, so it's nice to keep track of how many there are of each
+    int equallyShortHills = findNumOfEquallyShortHills(hills, N);
+    int equallyTallHills = findNumOfEquallyTallHills(hills, N);
+
     // biggest differences in hills are too big
     while (hills[N-1].height - hills->height > 17)
-        price += addToHills(hills, N);
+        price += addToHills(hills, N, equallyShortHills, equallyTallHills);
 
     std::ofstream fout("skidesign.out");
     fout << price << std::endl;
