@@ -30,6 +30,7 @@ int findPriceToChangeNHills(const Hill* hills, const int& N) {
     int price = 0;
     // Cost increases at a rate of 2n-1 where n is the new cost
     // ex: 3->4 : 4**2 - 3**2 == 2(4)-1 == 7
+    // was 2*(change+1)-1, but that's eq to 2*change+1
     for (int i = 0; i < N; ++i)
         price += 2*hills[i].change+1;
 
