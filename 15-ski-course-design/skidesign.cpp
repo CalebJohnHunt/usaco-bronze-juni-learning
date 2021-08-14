@@ -17,19 +17,13 @@ PROG: skidesign
  * only use qsort at the start 
 */
 
+#include <iostream>
 #include <fstream>
 
 struct Hill {
     int height;
     int change=0;
 };
-
-// Fun fact:
-// can technically be just an int compare
-// since it'll just read the first int of Hill anyway
-int HillCmpr(const void* a, const void* b) {
-    return ((Hill*)a)->height - ((Hill*)b)->height;
-}
 
 // Checks upwards
 // hills should point to the start of the possible hills
@@ -58,7 +52,7 @@ int findNumOfEquallyTallHills(const Hill* hills, const int& size) {
     return count;
 }
 
-void addToHills(Hill* hills, const int& size) {
+int addToHills(Hill* hills, const int& size) {
     // Calculate the price to raise all the shortest hills
     const int equallyShortHills = findNumOfEquallyShortHills(hills, size);
     const int priceForShortHills = findPriceToChangeNHills(hills, equallyShortHills);
@@ -68,7 +62,7 @@ void addToHills(Hill* hills, const int& size) {
     const int priceForTallHills  = findPriceToChangeNHills(hills + size - equallyTallHills, equallyTallHills);
 
     // If it's cheaper to raise the short hills, raise them
-    // if it's cheaper to lower the tall  hills, do so
+    // otherwise, lower the tall hills
     if (priceForShortHills <= priceForTallHills) {
         for (int i = 0; i < equallyShortHills; ++i) {
             hills[i].height++;
@@ -80,44 +74,59 @@ void addToHills(Hill* hills, const int& size) {
                 hills[i+equallyShortHills] = temp;
             }
         }
-    } else {
-        for (int i = 0; i < equallyTallHills; ++i) {
-            const int curIndex = size-1 - i;
-            hills[curIndex].height--;
-            hills[curIndex].change++;
-            // Keep hills sorted by moving each hill down the list if needs be
-            if (hills[curIndex - i].height < hills[curIndex - equallyTallHills].height) {
-                const Hill temp = hills[curIndex];
-                hills[curIndex] = hills[curIndex - equallyTallHills];
-                hills[curIndex - equallyTallHills] = temp;
-            }
+        return priceForShortHills;
+    }
+
+    for (int i = 0; i < equallyTallHills; ++i) {
+        const int curIndex = size-1 - i;
+        hills[curIndex].height--;
+        hills[curIndex].change++;
+        // Keep hills sorted by moving each hill down the list if needs be
+        if (hills[curIndex - i].height < hills[curIndex - equallyTallHills].height) {
+            const Hill temp = hills[curIndex];
+            hills[curIndex] = hills[curIndex - equallyTallHills];
+            hills[curIndex - equallyTallHills] = temp;
         }
     }
+    return priceForTallHills;
 }
 
-int main() {
+Hill* readHills(int& N) {
     std::ifstream fin("skidesign.in");
-    int N, i, price=0;
     fin >> N;
+    Hill* hills = new Hill[N];
+    // hills = (Hill*) malloc(N * (sizeof(Hill))); // Just trying this for fun
 
-    Hill hills[N];
-    for (i = 0; i < N; ++i)
-        fin >> hills[i].height;
+    Hill temp;
+    int j;
+    for (int i = 0; i < N; ++i) {
+        fin >> temp.height;
+
+        // Sort as you take in
+        for (j=0; j<i; ++j) {
+            if (temp.height < hills[j].height) {
+                const Hill t2 = hills[j];
+                hills[j] = temp;
+                temp = t2;
+            }
+        }
+        hills[j] = temp;
+    }
 
     fin.close();
 
-    qsort(hills, N, sizeof(Hill), HillCmpr);
+    return hills;
+}
+
+int main() {
+    int N, i, price=0;
+
+    // readHills updates N and sorts the hills as they come in
+    Hill* hills = readHills(N);
 
     // biggest differences in hills are too big
-    while (hills[N-1].height - hills[0].height > 17) {
-        addToHills(hills, N);
-        // addToHills (despite its bad naming) sorts the hills after changing them. So no need to qsort again.
-        // qsort(hills, N, sizeof(Hill), HillCmpr);
-    }
-
-    for (i = 0; i < N; ++i) {
-        price += hills[i].change * hills[i].change;
-    }
+    while (hills[N-1].height - hills->height > 17)
+        price += addToHills(hills, N);
 
     std::ofstream fout("skidesign.out");
     fout << price << std::endl;
