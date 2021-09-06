@@ -5,8 +5,13 @@ PROG: skidesign
 */
 
 #include <fstream>
+#include <iostream>
+#include <chrono>
 
 int main() {
+
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::ifstream fin("skidesign.in");
     int N, maxHeight=0;
     fin >> N;
@@ -36,6 +41,10 @@ int main() {
     std::ofstream fout("skidesign.out");
     fout << minPrice << std::endl;
     fout.close();
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Duration: " << (end - start).count() << std::endl;
 
     return 0;
 }

@@ -17,6 +17,7 @@ PROG: skidesign
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 struct Hill {
     int height;
@@ -113,6 +114,7 @@ Hill* readHills(int& N) {
 }
 
 int main() {
+    auto start = std::chrono::high_resolution_clock::now();
     int N, i, price=0;
 
     // readHills updates N and sorts the hills as they come in
@@ -131,6 +133,9 @@ int main() {
     fout << price << std::endl;
     fout.close();
     
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Duration: " << (end - start).count() << std::endl;
 
     return 0;
 }
